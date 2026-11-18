@@ -118,7 +118,6 @@ page = st.sidebar.radio(
         "Input Guide"
     ],
     key="page"
-)
 
 )
 
