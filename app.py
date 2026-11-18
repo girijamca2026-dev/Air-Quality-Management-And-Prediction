@@ -6,6 +6,7 @@
 # STREAMLIT DEPLOYMENT VERSION
 # ============================================================
 
+import os
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -16,6 +17,7 @@ import shap
 from lime.lime_tabular import LimeTabularExplainer
 from datetime import date
 
+
 # ------------------------------------------------------------
 # 1. PAGE CONFIGURATION
 # ------------------------------------------------------------
@@ -25,6 +27,7 @@ st.set_page_config(
     page_icon="🌍",
     layout="wide"
 )
+
 
 # ------------------------------------------------------------
 # 2. CUSTOM CSS
@@ -46,19 +49,35 @@ div.stButton > button {
     border-radius: 8px;
     font-weight: bold;
 }
-
 </style>
 """, unsafe_allow_html=True)
+
 
 # ------------------------------------------------------------
 # 3. LOAD TRAINED MODEL
 # ------------------------------------------------------------
 
-MODEL_PATH = "air_quality_model.pkl"
+# Get the folder where app.py is located
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Model must be in the same folder as app.py
+MODEL_PATH = os.path.join(
+    BASE_DIR,
+    "air_quality_model.pkl"
+)
+
 
 @st.cache_resource
 def load_model():
 
+    # Check whether model file exists
+    if not os.path.exists(MODEL_PATH):
+        raise FileNotFoundError(
+            f"Model file not found: {MODEL_PATH}\n"
+            f"Available files: {os.listdir(BASE_DIR)}"
+        )
+
+    # Load trained model
     pipeline = joblib.load(MODEL_PATH)
 
     model = pipeline["model"]
@@ -73,12 +92,16 @@ def load_model():
         lime_training_data
     )
 
+
 try:
+
     model, preprocessor, feature_names, lime_training_data = load_model()
 
 except Exception as e:
+
     st.error(f"Model loading failed: {e}")
     st.stop()
+
 
 # ------------------------------------------------------------
 # 4. APPLICATION HEADER
@@ -91,6 +114,7 @@ st.markdown("""
     border-radius: 14px;
     text-align: center;
 ">
+
 <h1 style="color:orange;">
 🌍 AIR QUALITY MANAGEMENT SYSTEM
 </h1>
@@ -99,16 +123,19 @@ st.markdown("""
 AI-Based Air Quality Management and Prediction
 System Using Machine Learning
 </h3>
+
 </div>
 """, unsafe_allow_html=True)
 
 st.write("")
+
 
 # ------------------------------------------------------------
 # 5. SIDEBAR NAVIGATION
 # ------------------------------------------------------------
 
 st.sidebar.title("📌 Navigation")
+
 page = st.sidebar.radio(
     "Select Page",
     [
@@ -118,7 +145,6 @@ page = st.sidebar.radio(
         "Input Guide"
     ],
     key="page"
-
 )
 
 st.sidebar.markdown("---")
@@ -134,6 +160,7 @@ st.sidebar.markdown("""
 
 **Project:** AGR STUDYORBIT
 """)
+
 
 # ------------------------------------------------------------
 # 6. HOME PAGE
@@ -170,8 +197,10 @@ if page == "Home":
     """)
 
     if st.button("🚀 Start Air Quality Prediction"):
+
         st.session_state["page"] = "Predictor"
         st.rerun()
+
 
 # ------------------------------------------------------------
 # 7. PREDICTOR PAGE
@@ -265,6 +294,7 @@ elif page == "Predictor":
             "🔮 Predict Air Quality"
         )
 
+
     # --------------------------------------------------------
     # 8. PREDICTION PROCESS
     # --------------------------------------------------------
@@ -308,19 +338,16 @@ elif page == "Predictor":
                 }])
 
                 # Apply saved preprocessing
-
                 processed = preprocessor.transform(
                     input_data
                 )
 
                 # Predict category
-
                 prediction = model.predict(
                     processed
                 )[0]
 
                 # Calculate probabilities
-
                 probabilities = model.predict_proba(
                     processed
                 )[0]
@@ -362,7 +389,6 @@ elif page == "Predictor":
                 )
 
                 # Probability chart
-
                 st.subheader("📊 Prediction Probability")
 
                 fig, ax = plt.subplots(figsize=(9, 4))
@@ -391,6 +417,7 @@ elif page == "Predictor":
             except Exception as e:
 
                 st.error(f"Prediction failed: {e}")
+
 
 # ------------------------------------------------------------
 # 9. SHAP AND LIME PAGE
@@ -512,6 +539,7 @@ elif page == "SHAP & LIME":
 
             st.error(f"SHAP explanation failed: {e}")
 
+
         # ----------------------------------------------------
         # LIME EXPLANATION
         # ----------------------------------------------------
@@ -587,6 +615,7 @@ elif page == "SHAP & LIME":
 
             st.error(f"LIME explanation failed: {e}")
 
+
 # ------------------------------------------------------------
 # 10. INPUT GUIDE PAGE
 # ------------------------------------------------------------
@@ -638,6 +667,7 @@ elif page == "Input Guide":
 
     with st.expander("Date"):
         st.write("Date of the air quality measurement.")
+
 
 # ------------------------------------------------------------
 # 11. FOOTER
