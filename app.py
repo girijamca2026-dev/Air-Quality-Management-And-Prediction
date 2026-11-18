@@ -109,7 +109,6 @@ st.write("")
 # ------------------------------------------------------------
 
 st.sidebar.title("📌 Navigation")
-
 page = st.sidebar.radio(
     "Select Page",
     [
@@ -117,7 +116,10 @@ page = st.sidebar.radio(
         "Predictor",
         "SHAP & LIME",
         "Input Guide"
-    ]
+    ],
+    key="page"
+)
+
 )
 
 st.sidebar.markdown("---")
