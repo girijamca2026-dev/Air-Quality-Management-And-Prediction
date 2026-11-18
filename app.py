@@ -151,17 +151,6 @@ page = st.sidebar.radio(
 
 st.sidebar.markdown("---")
 
-st.sidebar.markdown("""
-### Project Information
-
-**Domain:** Big Data + Machine Learning
-
-**Model:** Decision Tree Classifier
-
-**Interface:** Streamlit
-
-**Project:** AGR STUDYORBIT
-""")
 
 
 # ------------------------------------------------------------
@@ -197,11 +186,6 @@ if page == "Home":
     6. Air quality prediction
     7. Explainable AI using SHAP and LIME
     """)
-
-    if st.button("🚀 Start Air Quality Prediction"):
-
-        st.session_state["page"] = "Predictor"
-        st.rerun()
 
 
 # ------------------------------------------------------------
